@@ -1,0 +1,30 @@
+# datasets: large, public, downloadable via robomimic script
+datasets/
+*.hdf5
+
+# training outputs: checkpoints are hundreds of MB
+results_train/
+*.pth
+*.mp4
+train_log*.txt
+
+# python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# latex build artifacts
+*.aux
+*.log
+*.out
+*.synctex.gz
+*.fdb_latexmk
+*.fls
+*.bbl
+*.blg
+paper/paper.pdf
+
+# os
+.DS_Store
+Thumbs.db

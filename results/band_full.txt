@@ -1,0 +1,23 @@
+
+band T in [0, 99999]
+200 demos: 100 better / 100 worse
+T range in band: 98 to 1050
+
+better vs worse (>0.50 = ranks skill correctly), 95% bootstrap CI
+  ted            0.558  [0.480, 0.636]
+  ted_norm       0.304  [0.235, 0.375]
+  sal            0.952  [0.922, 0.975]
+  sal_norm       0.582  [0.497, 0.662]
+  jerk           0.584  [0.505, 0.665]
+  path_len       0.783  [0.718, 0.842]
+  path_len_norm  0.105  [0.068, 0.148]
+  T              0.957  [0.929, 0.980]  <- must be near 0.50 for the band to be a control
+
+mean score by tier (within band)
+          ted  ted_norm       sal  ...  path_len  path_len_norm       T
+skill                              ...                                 
+0      0.0783    0.0003  100.3935  ...    1.5676         0.0055  304.39
+1      0.0791    0.0005   57.4542  ...    1.2258         0.0071  180.53
+2      0.0660    0.0005   44.8896  ...    1.1225         0.0081  142.64
+
+[3 rows x 8 columns]
