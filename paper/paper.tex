@@ -11,7 +11,6 @@
 \usepackage[numbers,sort&compress]{natbib}
 \usepackage{hyperref}
 
-\newcommand{\todo}[1]{\textcolor{red}{\textbf{[TODO: #1]}}}
 \newcommand{\rinse}{\textsc{rinse}}
 
 \title{Smoothness Ranks Skill, Not Success:\\
@@ -47,10 +46,10 @@ downstream success relative to no curation at all (0.216 vs.\ 0.408).
 Inspecting individual trajectories shows why: on this task successful
 manipulation requires sustained high-deviation motion through the contact
 phase, while failure manifests as smooth low-amplitude hovering, so a
-smoothness metric measures commitment with the sign flipped. Our results extend the
-detection-vs-curation decoupling to named, published metrics, on operator
-labels rather than injected defects, and in a benchmark where the length
-confound is excluded by construction rather than by truncation.
+smoothness metric measures commitment with the sign flipped. Our results
+extend the detection-vs-curation decoupling to named, published metrics, on
+operator labels rather than injected defects, and to a benchmark where the
+length confound is excluded by construction rather than by truncation.
 \end{abstract}
 
 \section{Introduction}
@@ -101,15 +100,16 @@ fixed-horizon dataset removes it without touching the trajectories.
 
 Our findings are easy to state. Smoothness metrics rank \emph{operator
 skill} largely to the extent that skill is confounded with how long the
-episode took; once duration is controlled, by normalization or by
+episode took. Once duration is controlled, by normalization or by
 duration-matched subsets, SAL's advantage collapses and raw mean jerk, the
 crude baseline the smoothness literature positions itself against, becomes
 the strongest detector. Against \emph{task success}, on fixed-length data,
 both of \rinse{}'s metrics are at or below chance, with TED inverted, while
 jerk retains signal. Every metric-curated training condition underperforms
 both random subsampling and no curation at all, with TED curation nearly
-halving downstream success relative to doing nothing. Skill and success are different targets, and the
-curation literature validates on one while deploying against the other.
+halving downstream success relative to doing nothing. Skill and success are
+different targets, and the curation literature validates on one while
+deploying against the other.
 
 \section{Related Work}
 
@@ -125,9 +125,9 @@ work evaluates on pools containing failures.
 papers~\citep{bedi-audit,bedi-policy,bedi-phase} established the
 detection-vs-curation decoupling, documented the episode-length confound, and
 reported a negative result on per-phase metric selection. We adopt their
-framing and extend it to published metrics, real labels, and a
-natively fixed-length benchmark. Where they control length by truncating to a
-fixed prefix, our can/mg experiments require no such intervention.
+framing and extend it to published metrics, real labels, and a natively
+fixed-length benchmark. Where they control length by truncating to a fixed
+prefix, our can/mg experiments require no such intervention.
 
 \textbf{Evaluation practice.} Kress-Gazit et
 al.~\citep{empirical-science} and RoboEval~\citep{roboeval} argue that binary
@@ -213,7 +213,7 @@ metric strengthens monotonically (0.584, 0.862, 0.906, 0.896) and the
 sophisticated one weakens monotonically (0.952, 0.793, 0.759, 0.628).
 
 TED never clears chance in any band (0.558 full-sample, upper CI 0.636)
-and inverts to 0.359 in the tightest band. Notably, TED does \emph{not}
+and inverts to 0.359 in the tightest band. TED does \emph{not}
 have the length pathology (correlation $+0.14$ with $T$); it simply carries
 little skill signal on this data.
 
@@ -254,19 +254,19 @@ proxies rather than duration-free measures of smoothness.}
 
 \subsection{Task success on can/mg: the confound removed by construction}
 
-can/mg fixes every episode at 150 steps, so no metric can exploit duration.
-Against the success label (716 of 3900 successful), jerk achieves 0.706, SAL
-0.454, path length 0.421, and TED 0.376 (Figure~\ref{fig:main}b). The
-length baseline is exactly 0.500, as it must be. Per-timestep normalization
-leaves every AUROC unchanged, as expected under a constant divisor, which we
-report as a consistency check.
+The can/mg split fixes every episode at 150 steps, so no metric can exploit
+duration. Against the success label (716 of 3900 successful), jerk achieves
+0.706, SAL 0.454, path length 0.421, and TED 0.376
+(Figure~\ref{fig:main}b). The length baseline is exactly 0.500, as it must
+be. Per-timestep normalization leaves every AUROC unchanged, as expected
+under a constant divisor, which we report as a consistency check.
 
-Two readings of this table matter. First, both of \rinse{}'s metrics are at
-or below chance on the label practitioners actually deploy against.
-TED's inversion means that filtering by TED \emph{preferentially retains
-failed demonstrations}. Second, the ordering among metrics reverses relative
-to the uncontrolled skill setting: the metric that looked worst there (jerk)
-is the only one with signal here.
+Two readings of this result matter. First, both of \rinse{}'s metrics are at
+or below chance on the label practitioners actually deploy against. TED's
+inversion means that filtering by TED \emph{preferentially retains failed
+demonstrations}. Second, the ordering among metrics reverses relative to the
+uncontrolled skill setting: the metric that looked worst there (jerk) is the
+only one with signal here.
 
 \subsection{Secondary setting: can/paired}
 
@@ -289,7 +289,7 @@ gradient steps, learning rate $10^{-4}$) on each curated subset, with 50
 evaluation rollouts (horizon 400) every 150 epochs and the best checkpoint
 reported per seed. Conditions: TED, SAL, jerk, path length, plus three
 references: an \emph{oracle} keeping only successful demonstrations, a
-\emph{random} 50\% subset, and an uncurated-size-matched control. Five seeds
+\emph{random} 50\% subset, and an uncurated size-matched control. Five seeds
 per condition. All filtered pools contain 1950 demonstrations except the
 oracle (716, the number of successes that exist); we therefore treat the
 oracle as a ceiling reference rather than a matched condition.
@@ -330,17 +330,17 @@ overlap random subsampling's [0.348, 0.436], nearly halving downstream
 performance relative to training on the full, unfiltered pool. Path length
 is similarly and clearly separated from random (0.296 [0.272, 0.320]). SAL
 and jerk are directionally below random and no-curation as well, but their
-intervals overlap those baselines, so we report this as consistent with, not
-statistically distinguishable from, underperforming random selection at
+intervals overlap those baselines, so we report this as consistent with, but
+not statistically distinguishable from, underperforming random selection at
 $n{=}5$ seeds.
 
 The downstream ordering mostly, but not perfectly, tracks the detection
 ordering from Section~\ref{sec:detection}: TED is worst in both, and path
-length is weak in both. Jerk had the best detection AUROC on mg (0.706) but
-is narrowly \emph{outperformed} downstream by SAL (0.320 vs.\ 0.348), whose
-detection AUROC was near chance (0.454). We do not read this as
+length is weak in both. Jerk had the best detection AUROC on can/mg (0.706)
+but is narrowly \emph{outperformed} downstream by SAL (0.320 vs.\ 0.348),
+whose detection AUROC was near chance (0.454). We do not read this as
 contradicting the main claim; both are clearly below random and no
-curation, and detection AUROC on a 50\%-keep threshold need not perfectly
+curation, and detection AUROC at a 50\%-keep threshold need not perfectly
 order two conditions that are both close to a no-information floor. It
 does mean detection accuracy is at best a coarse predictor of curation
 value, consistent with the decoupling reported
