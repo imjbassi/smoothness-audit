@@ -46,7 +46,10 @@ downstream success relative to no curation at all (0.216 vs.\ 0.408).
 Inspecting individual trajectories shows why: on this task successful
 manipulation requires sustained high-deviation motion through the contact
 phase, while failure manifests as smooth low-amplitude hovering, so a
-smoothness metric measures commitment with the sign flipped. Our results
+smoothness metric measures commitment with the sign flipped. The length
+confound replicates on a second task: on square/mh, SAL correlates $+0.96$
+with episode duration and its skill AUROC falls from 0.898 to 0.480 inside a
+duration-matched band, while jerk rises from 0.431 to 0.896. Our results
 extend the detection-vs-curation decoupling to named, published metrics, on
 operator labels rather than injected defects, and to a benchmark where the
 length confound is excluded by construction rather than by truncation.
@@ -155,14 +158,22 @@ arc length. Where indicated we also report per-timestep normalizations
 the authors' code; Section~\ref{sec:limitations} discusses the resulting
 caveat and the sanity check we ran.
 
-\textbf{Datasets.} All data is public robomimic~\citep{robomimic} low-dim
-Can. \emph{can/mh}: 300 successful demonstrations from six human operators
+\textbf{Datasets.} All data is public robomimic~\citep{robomimic} low-dim.
+\emph{can/mh}: 300 successful demonstrations from six human operators
 with released skill tiers (better/okay/worse, 100 each); episode lengths
 range 98--1050 steps. \emph{can/mg}: 3900 machine-generated demonstrations,
 18.4\% successful, every episode exactly 150 steps. \emph{can/paired}: 200
 demonstrations in matched success/failure pairs (50\% successful), lengths
 55--147; we report it as a secondary setting because its matched-pair
 construction makes it adversarially hard for trajectory-level scores.
+\emph{square/mh}: 300 successful demonstrations with the same skill-tier
+structure (100 each), episode lengths 123--1051, used in
+Section~\ref{sec:square} to test whether the length confound is
+task-specific. We note that Can is the only robomimic task with
+failure-containing splits (\texttt{mg} and \texttt{paired}); Square,
+Transport, and Tool Hang ship only proficient-human and multi-human data,
+all of it successful. Our success-label experiments are therefore confined
+to Can by benchmark availability, not by choice.
 
 \textbf{Statistics.} All AUROCs are reported with 95\% bootstrap confidence
 intervals (2000 resamples). For skill we report better-vs-worse AUROC; for
@@ -277,6 +288,70 @@ systematically \emph{longer} (length-alone AUROC 0.194), and path length's
 $+0.86$ correlation with $T$ makes it a pure length detector here. We
 report can/paired for completeness and treat can/mg as the primary
 success-label evidence.
+
+\subsection{Generalization to a second task: square/mh}
+\label{sec:square}
+
+If the length confound were an artifact of the Can task, the argument would
+be considerably weaker. We therefore repeat the skill-label analysis on
+square/mh, a harder insertion task with the same operator skill-tier
+structure and a comparable duration range (123--1051 steps versus Can's
+98--1050). No retuning was performed: the same metric implementations and
+the same band procedure were applied to the new data.
+
+The confound replicates almost exactly. SAL's correlation with episode
+duration is $+0.96$ on Square against $+0.97$ on Can, and its uncontrolled
+skill AUROC is 0.898 [0.852, 0.936] against a length-alone baseline of 0.936
+[0.902, 0.964]. Per-timestep normalization collapses it to 0.458 [0.376,
+0.536], slightly below chance and a larger drop than the corresponding Can
+figure. Path length behaves the same way, reaching 0.931 [0.893, 0.963]
+uncontrolled with a $+0.90$ duration correlation.
+
+The crossover also replicates (Table~\ref{tab:square}). As the duration band
+tightens and the length baseline falls from 0.936 to 0.407, SAL falls
+monotonically (0.898, 0.759, 0.529, 0.480) while jerk rises monotonically
+(0.431, 0.570, 0.782, 0.896). In the band where duration is genuinely
+controlled ($T \in [200,240]$, length AUROC 0.407), jerk reaches 0.896
+[0.724, 1.000] --- numerically identical to its value in Can's tightest band
+--- while SAL sits at 0.480 [0.250, 0.701], a CI centred on chance.
+
+Two differences from Can are worth stating. First, jerk is \emph{inverted}
+on Square before any control is applied (0.431), where on Can it was weakly
+positive (0.584); the uncontrolled ranking of metrics is therefore itself
+task-dependent, even though the controlled ranking is not. Second, path
+length remains strong in the controlled band on Square (0.887 [0.742,
+0.991]) where it collapsed on Can (0.429 [0.215, 0.645]). We do not claim
+jerk or path length is a good curation metric on the strength of these
+numbers; the point is narrower, that whatever advantage SAL displays over
+them disappears once duration is held fixed, on both tasks. The tightest
+Square band retains 13 worse-operator demonstrations, so as with Can the
+claim rests on the monotone trend across bands rather than on any single
+cell.
+
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{lcccc}
+\toprule
+& full ($n{=}200$) & $T \in [150,300]$ ($n{=}111$) & $T \in [180,260]$ ($n{=}55$) & $T \in [200,240]$ ($n{=}30$) \\
+\midrule
+SAL       & 0.898 [.852,.936] & 0.759 [.658,.849] & 0.529 [.344,.702] & 0.480 [.250,.701] \\
+SAL$/T$   & 0.458 [.376,.536] & 0.485 [.372,.602] & 0.468 [.300,.653] & 0.520 [.280,.738] \\
+TED       & 0.663 [.584,.736] & 0.685 [.577,.788] & 0.599 [.427,.758] & 0.557 [.335,.785] \\
+jerk      & 0.431 [.349,.509] & 0.570 [.455,.687] & 0.782 [.618,.923] & 0.896 [.724,1.000] \\
+path len. & 0.931 [.893,.963] & 0.817 [.726,.895] & 0.796 [.654,.913] & 0.887 [.742,.991] \\
+\midrule
+length $T$ & 0.936 [.902,.964] & 0.824 [.738,.898] & 0.613 [.456,.766] & \textbf{0.407} [.197,.629] \\
+\bottomrule
+\end{tabular}
+\caption{Better-vs-worse operator AUROC on \emph{square}/mh across duration
+bands, with 95\% bootstrap CIs, in the same format as
+Table~\ref{tab:bands}. The bottom row is the control. The SAL/jerk
+crossover observed on Can reproduces here: SAL tracks the length baseline
+down while jerk rises, and in the band where length is at chance jerk
+reaches the same 0.896 it reaches in Can's tightest band.}
+\label{tab:square}
+\end{table}
 
 \section{Does Detection Predict Curation? Downstream Training}
 \label{sec:training}
@@ -423,9 +498,13 @@ consistent with but not evidence for that number.
 \section{Limitations}
 \label{sec:limitations}
 
-This audit covers one task family (robomimic Can) and one policy class
-(GMM behavior cloning); the detection results are policy-free but the
-downstream results may differ under sequence models or diffusion policies.
+Our detection results cover two robomimic tasks (Can and Square) but our
+success-label and downstream-training results cover only Can, because Can is
+the only robomimic task shipping failure-containing splits; extending the
+success-label analysis requires moving to a different benchmark such as
+LIBERO. We use one policy class (GMM behavior cloning); the detection
+results are policy-free but the downstream results may differ under sequence
+models or diffusion policies.
 Our TED is a reimplementation from the \rinse{} appendix, not the authors'
 released code; as a sanity check it broadly agrees with SAL's ranking on the
 clean proficient-human data, but a discrepancy with the reference
@@ -452,7 +531,8 @@ their authors did not, on real operator labels under duration controls and
 on fixed-length data against task success, rank episode duration more than
 demonstration quality. Once duration is controlled, the crude jerk baseline
 they were designed to supersede outperforms them, and the contact-aware
-metric inverts. Training on the metrics' own curated subsets confirms the
+metric inverts, and the same crossover reproduces on a second task without
+retuning. Training on the metrics' own curated subsets confirms the
 practical stakes: every metric we tested produces a policy worse than
 training on the full, unfiltered pool, with TED curation nearly halving
 downstream success relative to doing nothing at all.
